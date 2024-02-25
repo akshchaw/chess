@@ -67,11 +67,13 @@ def main():
     clock = p.time.Clock()
 
     gs = GameState()
+    valid_moves = gs.get_valid_moves()
     load_images()
 
     square_selected = ()
     player_clicks = []
     running = True
+    makes_move = False
 
     while running:
         for event in p.event.get():
@@ -91,11 +93,24 @@ def main():
                     player_clicks.append(square_selected)
                 # if the user clicks the second time, need to make move
                 if len(player_clicks) == 2:
+                    print(player_clicks)
                     move = Move(player_clicks[0], player_clicks[1], gs.board)
-                    gs.make_move(move)
+                    if move in valid_moves:
+                        gs.make_move(move)
                     # reset the move information
                     square_selected = ()
                     player_clicks = []
+            # key event handlers
+            elif event.type == p.KEYDOWN:
+                # if 'z' is pressed to undo move
+                if event.key == p.K_z:
+                    gs.undo_move()
+                    makes_move = True
+        # if move is made then regenerate the valid moves again
+        if makes_move:
+            valid_moves = gs.get_valid_moves()
+            makes_move = False
+
         draw_game_state(screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
