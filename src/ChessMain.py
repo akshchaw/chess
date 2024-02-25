@@ -3,7 +3,7 @@ This is the main driver file. It will track the current game state and user inpu
 """
 
 import pygame as p
-from src.ChessEngine import GameState
+from src.ChessEngine import GameState, Move
 
 HEIGHT = WIDTH = 512
 DIMENSION = 8
@@ -46,7 +46,6 @@ def draw_pieces(screen: p.Surface | p.SurfaceType, gs: GameState):
                 screen.blit(IMAGES[piece], p.Rect(col * SQ_SIZE, row * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 
-
 def draw_game_state(screen: p.Surface | p.SurfaceType, gs: GameState):
     """
     Draw the board and the pieces of the current game state
@@ -69,12 +68,34 @@ def main():
 
     gs = GameState()
     load_images()
+
+    square_selected = ()
+    player_clicks = []
     running = True
 
     while running:
-        for e in p.event.get():
-            if e.type == p.QUIT:
+        for event in p.event.get():
+            if event.type == p.QUIT:
                 running = False
+            # mouse event handlers
+            elif event.type == p.MOUSEBUTTONDOWN:
+                mouse_location = p.mouse.get_pos()
+                block_row = mouse_location[1] // SQ_SIZE
+                block_col = mouse_location[0] // SQ_SIZE
+                # if user previously selected the same square, don't update the information
+                if square_selected == (block_row, block_col):
+                    square_selected = ()
+                    player_clicks = []
+                else:
+                    square_selected = (block_row, block_col)
+                    player_clicks.append(square_selected)
+                # if the user clicks the second time, need to make move
+                if len(player_clicks) == 2:
+                    move = Move(player_clicks[0], player_clicks[1], gs.board)
+                    gs.make_move(move)
+                    # reset the move information
+                    square_selected = ()
+                    player_clicks = []
         draw_game_state(screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
