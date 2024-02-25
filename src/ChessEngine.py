@@ -5,6 +5,7 @@ class GameState:
     board: list[list[str]]
     white_to_move: bool
     move_log: list
+    move_functions: dict
 
     def __init__(self):
         # board is 8X8 2D list, each element has 2 elements
@@ -20,6 +21,8 @@ class GameState:
             ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
         ]
+        self.move_functions = {'p': self.get_pawn_moves, 'R': self.get_rook_moves, 'N': self.get_knight_moves,
+                               'B': self.get_bishop_moves, 'Q': self.get_queen_moves, 'K': self.get_king_moves}
         self.white_to_move = True
         self.move_log = []
 
@@ -60,16 +63,87 @@ class GameState:
                 piece_color = self.board[row][col][0]
                 if (piece_color == 'w' and self.white_to_move) or (piece_color == 'b' and not self.white_to_move):
                     piece_type = self.board[row][col][1]
-                    # if the piece is pawn
-                    if piece_type == 'p':
-                        self.get_pawn_moves(row, col, moves)
+                    self.move_functions[piece_type](row, col, moves)
         return moves
 
-    def get_pawn_moves(self, row: int, col: int, moves: list) -> None:
+    def get_pawn_moves(self, row: int, col: int, moves: list):
         """
         Get all the pawn moves
         :param row: the row at which pawn is located
         :param col: the column at which the pawn is located
+        :param moves: the moves of pawn to be added to the list
+        """
+        if self.white_to_move:
+            # 1 square pawn advance
+            if self.board[row - 1][col] == '--':
+                moves.append(Move((row, col), (row - 1, col), self.board))
+                # 2 square row advance
+                if row == 6 and self.board[row - 2][col] == '--':
+                    moves.append(Move((row, col), (row - 2, col), self.board))
+        # enemy piece to capture on left
+            if col - 1 >= 0:
+                if self.board[row - 1][col - 1][0] == 'b':
+                    moves.append(Move((row, col), (row - 1, col - 1), self.board))
+            # enemy piece to capture on right
+            if col + 1 <= 7:
+                if self.board[row - 1][col + 1][0] == 'b':
+                    moves.append(Move((row, col), (row - 1, col + 1), self.board))
+        else:
+            if self.board[row + 1][col] == '--':
+                moves.append(Move((row, col), (row + 1, col), self.board))
+                # 2 square row advance
+                if row == 1 and self.board[row + 2][col] == '--':
+                    moves.append(Move((row, col), (row + 2, col), self.board))
+            # enemy piece to capture on left
+            if col - 1 >= 0:
+                if self.board[row + 1][col - 1][0] == 'w':
+                    moves.append(Move((row, col), (row + 1, col - 1), self.board))
+            # enemy piece to capture on right
+            if col + 1 <= 7:
+                if self.board[row + 1][col + 1][0] == 'w':
+                    moves.append(Move((row, col), (row + 1, col + 1), self.board))
+
+    def get_rook_moves(self, row: int, col: int, moves: list):
+        """
+        Get all the rook moves
+        :param row: the row at which rook is located
+        :param col: the column at which the rook is located
+        :param moves: the moves of pawn to be added to the list
+        """
+        pass
+
+    def get_knight_moves(self, row: int, col: int, moves: list):
+        """
+        Get all the knight moves
+        :param row: the row at which knight is located
+        :param col: the column at which the knight is located
+        :param moves: the moves of pawn to be knight to the list
+        """
+        pass
+
+    def get_bishop_moves(self, row: int, col: int, moves: list):
+        """
+        Get all the bishop moves
+        :param row: the row at which bishop is located
+        :param col: the column at which the bishop is located
+        :param moves: the moves of pawn to be added to the list
+        """
+        pass
+
+    def get_queen_moves(self, row: int, col: int, moves: list):
+        """
+        Get all the queen moves
+        :param row: the row at which queen is located
+        :param col: the column at which the queen is located
+        :param moves: the moves of pawn to be added to the list
+        """
+        pass
+
+    def get_king_moves(self, row: int, col: int, moves: list):
+        """
+        Get all the king moves
+        :param row: the row at which king is located
+        :param col: the column at which the king is located
         :param moves: the moves of pawn to be added to the list
         """
         pass
