@@ -94,12 +94,15 @@ def main():
                 # if the user clicks the second time, need to make move
                 if len(player_clicks) == 2:
                     move = Move(player_clicks[0], player_clicks[1], gs.board)
+                    print(move.chess_notation())
                     if move in valid_moves:
                         gs.make_move(move)
                         makes_move = True
-                    # reset the move information
-                    square_selected = ()
-                    player_clicks = []
+                        # reset the move information
+                        square_selected = ()
+                        player_clicks = []
+                    else:
+                        player_clicks = [square_selected]
             # key event handlers
             elif event.type == p.KEYDOWN:
                 # if 'z' is pressed to undo move

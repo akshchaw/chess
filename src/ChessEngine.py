@@ -80,7 +80,7 @@ class GameState:
                 # 2 square row advance
                 if row == 6 and self.board[row - 2][col] == '--':
                     moves.append(Move((row, col), (row - 2, col), self.board))
-        # enemy piece to capture on left
+            # enemy piece to capture on left
             if col - 1 >= 0:
                 if self.board[row - 1][col - 1][0] == 'b':
                     moves.append(Move((row, col), (row - 1, col - 1), self.board))
@@ -110,7 +110,28 @@ class GameState:
         :param col: the column at which the rook is located
         :param moves: the moves of pawn to be added to the list
         """
-        pass
+        directions = ((-1, 0), (0, -1), (0, 1), (1, 0))
+        enemy_color = "b" if self.white_to_move else "w"
+        for d in directions:
+            for i in range(1, 8):
+                end_row = row + d[0] * i
+                end_col = col + d[1] * i
+                # check if rook moves are on board
+                if 0 <= end_row < 8 and 0 <= end_col < 8:
+                    end_piece = self.board[end_row][end_col]
+                    # if the space is empty, include the space and check for the further spaces in that direction
+                    if end_piece == "--":
+                        moves.append(Move((row, col), (end_row, end_col), self.board))
+                    # if the space has enemy, include the move and break (can't go beyond it)
+                    elif end_piece[0] == enemy_color:
+                        moves.append(Move((row, col), (end_row, end_col), self.board))
+                        break
+                    # if the space has same color, don't allow the move and further moves in the same direction
+                    else:
+                        break
+                # if the space is outside the board
+                else:
+                    break
 
     def get_knight_moves(self, row: int, col: int, moves: list):
         """
@@ -119,7 +140,17 @@ class GameState:
         :param col: the column at which the knight is located
         :param moves: the moves of pawn to be knight to the list
         """
-        pass
+        knight_moves = ((-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1))
+        enemy_color = "b" if self.white_to_move else "w"
+        for move in knight_moves:
+            end_row = row + move[0]
+            end_col = col + move[1]
+            # check if rook moves are on board
+            if 0 <= end_row < 8 and 0 <= end_col < 8:
+                end_piece = self.board[end_row][end_col]
+                # if the end position has either enemy piece or is empty
+                if end_piece[0] == enemy_color or end_piece[0] == "-":
+                    moves.append(Move((row, col), (end_row, end_col), self.board))
 
     def get_bishop_moves(self, row: int, col: int, moves: list):
         """
@@ -128,7 +159,28 @@ class GameState:
         :param col: the column at which the bishop is located
         :param moves: the moves of pawn to be added to the list
         """
-        pass
+        directions = ((-1, -1), (-1, 1), (1, -1), (1, 1))
+        enemy_color = "b" if self.white_to_move else "w"
+        for d in directions:
+            for i in range(1, 8):
+                end_row = row + d[0] * i
+                end_col = col + d[1] * i
+                # check if rook moves are on board
+                if 0 <= end_row < 8 and 0 <= end_col < 8:
+                    end_piece = self.board[end_row][end_col]
+                    # if the space is empty, include the space and check for the further spaces in that direction
+                    if end_piece == "--":
+                        moves.append(Move((row, col), (end_row, end_col), self.board))
+                    # if the space has enemy, include the move and break (can't go beyond it)
+                    elif end_piece[0] == enemy_color:
+                        moves.append(Move((row, col), (end_row, end_col), self.board))
+                        break
+                    # if the space has same color, don't allow the move and further moves in the same direction
+                    else:
+                        break
+                # if the space is outside the board
+                else:
+                    break
 
     def get_queen_moves(self, row: int, col: int, moves: list):
         """
@@ -137,7 +189,9 @@ class GameState:
         :param col: the column at which the queen is located
         :param moves: the moves of pawn to be added to the list
         """
-        pass
+        # it is a combination of rook and knight moves
+        self.get_knight_moves(row, col, moves)
+        self.get_rook_moves(row, col, moves)
 
     def get_king_moves(self, row: int, col: int, moves: list):
         """
@@ -146,7 +200,17 @@ class GameState:
         :param col: the column at which the king is located
         :param moves: the moves of pawn to be added to the list
         """
-        pass
+        king_moves = ((-1, 0), (0, -1), (0, 1), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1))
+        enemy_color = "b" if self.white_to_move else "w"
+        for move in king_moves:
+            end_row = row + move[0]
+            end_col = col + move[1]
+            # check if rook moves are on board
+            if 0 <= end_row < 8 and 0 <= end_col < 8:
+                end_piece = self.board[end_row][end_col]
+                # if the end position has either enemy piece or is empty
+                if end_piece[0] == enemy_color or end_piece[0] == "-":
+                    moves.append(Move((row, col), (end_row, end_col), self.board))
 
 
 class Move:
